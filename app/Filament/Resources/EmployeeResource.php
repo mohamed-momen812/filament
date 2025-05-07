@@ -3,57 +3,86 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\Employee;
-use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EmployeeResource extends Resource
 {
     protected static ?string $model = Employee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group'; // Optional: Icon for the navigation item
+    protected static ?string $navigationGroup = 'Employees Managment'; // Optional: Grouping in the navigation
+    protected static ?int $navigationSort = 1; // Optional: Sort order in the navigation
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('department_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('city_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('state_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('country_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('first_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('middle_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('zip_code')
-                    ->required()
-                    ->maxLength(5),
-                Forms\Components\DatePicker::make('date_of_birth')
-                    ->required(),
-                Forms\Components\DatePicker::make('date_of_hireds')
-                    ->required(),
+                 Section::make('Department Information')
+                    ->description('Fill in the department information of the employee')
+                    ->schema([
+                        Select::make('department_id')
+                            ->relationship('department', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Select::make('city_id')
+                            ->relationship('city', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Select::make('state_id')
+                            ->relationship('state', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Select::make('country_id')
+                            ->relationship('country', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                    ]),
+                Section::make('Personal Information')
+                    ->description('Fill in the personal information of the employee')
+                    ->schema([
+                        TextInput::make('first_name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('last_name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('middle_name')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
+                Section::make('Address Information')
+                    ->description('Fill in the address information of the employee')
+                    ->schema([
+                        TextInput::make('address')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('zip_code')
+                            ->required()
+                            ->maxLength(10),
+                    ]),
+                Section::make('Date Information')
+                    ->description('Fill in the date information of the employee')
+                    ->schema([
+                        TextInput::make('date_of_birth')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('date_of_hireds')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
             ]);
     }
 

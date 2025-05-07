@@ -6,6 +6,8 @@ use App\Filament\Resources\StateResource\Pages;
 use App\Filament\Resources\StateResource\RelationManagers;
 use App\Models\State;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,7 +19,7 @@ class StateResource extends Resource
 {
     protected static ?string $model = State::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt'; // Optional: Icon for the navigation item
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2'; // Optional: Icon for the navigation item
     protected static ?string $navigationGroup = 'System Managment'; // Optional: Grouping in the navigation
     protected static ?string $navigationLabel = 'States'; // Optional: Label for the navigation item
     protected static ?string $modelLabel = 'States'; // Optional: Tooltip for the navigation badge
@@ -27,10 +29,12 @@ class StateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('country_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
+                Select::make('country_id')
+                    ->relationship('country', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
