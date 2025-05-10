@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\App\Resources;
 
-use App\Filament\Resources\DepartmentResource\Pages;
+use App\Filament\App\Resources\DepartmentResource\Pages;
 use App\Models\Department;
-use Filament\Forms;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -16,7 +16,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class DepartmentResource extends Resource
@@ -28,7 +27,7 @@ class DepartmentResource extends Resource
     protected static ?string $navigationLabel = 'Department'; // Optional: Label for the navigation item
     protected static ?string $modelLabel = 'Department'; // Optional: Tooltip for the navigation badge
 
-    protected static ?int $navigationSort = 4; // Optional: Sort order in the navigation
+    protected static ?int $navigationSort = 1; // Optional: Sort order in the navigation
     public static function form(Form $form): Form
     {
         return $form
@@ -43,10 +42,6 @@ class DepartmentResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('team.name')
-                    ->label('Team Name')
-                    ->sortable()
-                    ->searchable(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('employees_count')
@@ -61,13 +56,7 @@ class DepartmentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('team_id')
-                ->relationship('team', 'name')
-                ->placeholder('Select Team')
-                ->searchable()
-                ->preload()
-                ->indicator('Team') // Optional: Custom label for the filter which will appear in the filter list
-                ->label('filter by team'), // Optional: Custom label for the filter
+                //
             ])
             ->actions([
                 ViewAction::make(),
@@ -116,7 +105,7 @@ class DepartmentResource extends Resource
 
     public static function getNavigationBadge(): ?string // Optional: Display a badge with the count of records in the navigation item
     {
-        return static::getModel()::count(); // getModel() is a static method that returns the model class name
+        return static::getModel()::where('team_id', Filament::getTenant()->id)->count(); // getModel() is a static method that returns the model class name
     }
 
     public static function getNavigationBadgeColor(): ?string // Optional: Set the color of the badge

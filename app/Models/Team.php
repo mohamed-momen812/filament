@@ -4,21 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Team extends Model
 {
     protected $fillable = [
         'name',
-        'country_id',
-        'city_id',
+        'slug'
     ];
+
 
     public function employees()
     {
         return $this->hasMany(Employee::class);
     }
 
-    public function team() // Assuming you have a Team model for multi-tenancy
+    public function departments()
     {
-        return $this->belongsTo(Team::class);
+        return $this->hasMany(Department::class);
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class);
     }
 }

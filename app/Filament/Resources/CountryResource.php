@@ -3,13 +3,23 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
+use App\Filament\Resources\CountryResource\RelationManagers\EmployeesRelationManager;
+use App\Filament\Resources\CountryResource\RelationManagers\StateRelationManager;
+use App\Filament\Resources\CountryResource\RelationManagers\StatesRelationManager;
 use App\Models\Country;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
+use Illuminate\Console\View\Components\Info;
 
 class CountryResource extends Resource
 {
@@ -19,7 +29,6 @@ class CountryResource extends Resource
     protected static ?string $navigationGroup = 'System Managment'; // Optional: Grouping in the navigation
     protected static ?string $navigationLabel = 'Country'; // Optional: Label for the navigation item
     protected static ?string $modelLabel = 'Employees Country'; // Optional: Tooltip for the navigation badge
-
     protected static ?int $navigationSort = 1; // Optional: Sort order in the navigation
 
 
@@ -44,13 +53,18 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('phonecode')
+                    ->searchable(),
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -59,20 +73,39 @@ class CountryResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(Infolist $infoList): InfoList
+    {
+        return $infoList
+            ->schema([
+                Section::make('Country Information')
+                    ->description('Fill in the country information')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Country Name'),
+                        TextEntry::make('code')
+                            ->label('Country Code'),
+                        TextEntry::make('phonecode')
+                            ->label('Phone Code'),
+                    ])
+                    ->columns(2),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            StatesRelationManager::class,
+            EmployeesRelationManager::class,
         ];
     }
 
@@ -85,4 +118,14 @@ class CountryResource extends Resource
             'edit' => Pages\EditCountry::route('/{record}/edit'),
         ];
     }
+
+    // public static function getNavigationBadge(): ?string // Optional: Display a badge with the count of records in the navigation item
+    // {
+    //     return static::getModel()::count(); // getModel() is a static method that returns the model class name
+    // }
+
+    // public static function getNavigationBadgeColor(): ?string // Optional: Set the color of the badge
+    // {
+    //     return 'success'; // You can use any color from Tailwind CSS
+    // }
 }

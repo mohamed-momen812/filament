@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\App\Resources;
 
-use App\Filament\Resources\EmployeeResource\Pages;
+use App\Filament\App\Resources\EmployeeResource\Pages;
 use App\Models\City;
 use App\Models\Employee;
 use App\Models\State;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -44,7 +45,6 @@ class EmployeeResource extends Resource
 
     public static function form(Form $form): Form
     {
-
         return $form
             ->schema([
                 Section::make('Department Information')
@@ -76,11 +76,14 @@ class EmployeeResource extends Resource
                             ->preload()
                             ->required(),
                         Select::make('department_id')
-                            ->relationship('department', 'name')
+                            ->relationship(
+                                'department',
+                                'name',
+                                fn (Builder $query) => $query->whereBelongsTo( Filament::getTenant()) )
                             ->searchable()
                             ->preload()
                             ->required(),
-                        ])
+                    ])
                     ->columns(2),
             Section::make('Personal Information')
                 ->description('Fill in the personal information of the employee')
@@ -125,8 +128,6 @@ class EmployeeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('team.name')
-                    ->sortable(),
                 TextColumn::make('department.name')
                     ->sortable(),
                 TextColumn::make('first_name')
@@ -159,13 +160,6 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([ // Optional: Add filters to the table
-                SelectFilter::make('team_id')
-                    ->relationship('team', 'name')
-                    ->placeholder('Select Team')
-                    ->searchable()
-                    ->preload()
-                    ->indicator('Team') // Optional: Custom label for the filter which will appear in the filter list
-                    ->label('filter by team'), // Optional: Custom label for the filter
                 SelectFilter::make('Department')
                     ->relationship('department', 'name')
                     // ->multiple() // Optional: Allow multiple selections
@@ -205,8 +199,8 @@ class EmployeeResource extends Resource
 
                         return $indicators;
                     })
-                ->columnSpan(2) // Optional: Column span for the filter form
-                ->columns(2), // Optional: Number of columns for the filter form
+                    ->columnSpan(2) // Optional: Column span for the filter form
+                    ->columns(2), // Optional: Number of columns for the filter form
             ], FiltersLayout::Dropdown) // Optional: Layout for the filters
             ->filtersFormColumns(3) // Optional: Number of columns for the filters form
             ->actions([
@@ -288,7 +282,7 @@ class EmployeeResource extends Resource
 
     public static function getNavigationBadge(): ?string // Optional: Display a badge with the count of records in the navigation item
     {
-        return static::getModel()::count(); // getModel() is a static method that returns the model class name
+        return static::getModel()::where('team_id', Filament::getTenant()->id)->count(); // getModel() is a static method that returns the model class name
     }
 
         public static function getGlobalSearchResultTitle(Model $record): string // Optional: Title for the global search result

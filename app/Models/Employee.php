@@ -7,10 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     protected $fillable = [
-        'name',
-        'email',
-        'phone',
         'department_id',
+        'country_id',
+        'state_id',
+        'city_id',
+        'address',
+        'zip_code',
+        'date_of_birth',
+        'date_of_hireds',
+        'first_name',
+        'last_name',
+        'middle_name',
     ];
 
     public function department()
@@ -28,5 +35,10 @@ class Employee extends Model
     public function state()
     {
         return $this->belongsTo(State::class);
+    }
+
+    public function team() // Assuming you have a Team model for multi-tenancy
+    {
+        return $this->belongsTo(Team::class);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\EmployeeResource\Pages;
+namespace App\Filament\App\Resources\EmployeeResource\Pages;
 
-use App\Filament\Resources\EmployeeResource;
+use App\Filament\App\Resources\EmployeeResource;
 use App\Models\Employee;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Components\Tab;

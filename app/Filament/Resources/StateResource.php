@@ -2,18 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\StateResource\RelationManagers\EmployeesRelationManager;
 use App\Filament\Resources\StateResource\Pages;
-use App\Filament\Resources\StateResource\RelationManagers;
+use App\Filament\Resources\StateResource\RelationManagers\CitiesRelationManager;
+use App\Filament\Resources\StateResource\RelationManagers\CountryRelationManager;
 use App\Models\State;
-use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section as ComponentsSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StateResource extends Resource
 {
@@ -44,38 +50,59 @@ class StateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
+                    // ->hidden(auth()->user()->email === 'momen@gmail.com') // Optional: Hide this column for a specific user
+                    ->visible(auth()->user()->email === 'momen@gmail.com') // Optional: show this column for a specific user
+                    ->label('State Name') // Optional: Custom label for the column
+                    ->searchable() // Enable searching on this column
+                    ->sortable(), // Optional: Enable searching and sorting
+                TextColumn::make('country.name') // Assuming you have a relationship named 'country' in your State model
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ])->defaultSort('name') // Optional: Default sorting
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(), // Optional: View action for each row
+                EditAction::make(), // Optional: Edit action for each row
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function getRelations(): array
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                ComponentsSection::make('State Information')
+                    ->description('Fill in the state information')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('State Name'),
+                        TextEntry::make('country.name')
+                            ->label('Country Name')
+
+                    ])
+            ]);
+    }
+
+    public static function getRelations(): array // Optional: Define the relations that can be managed from this resource
     {
         return [
-            //
+            CitiesRelationManager::class,
+            EmployeesRelationManager::class,
         ];
     }
 
@@ -88,4 +115,14 @@ class StateResource extends Resource
             'edit' => Pages\EditState::route('/{record}/edit'),
         ];
     }
+
+    // public static function getNavigationBadge(): ?string // Optional: Display a badge with the count of records in the navigation item
+    // {
+    //     return static::getModel()::count(); // getModel() is a static method that returns the model class name
+    // }
+
+    // public static function getNavigationBadgeColor(): ?string // Optional: Set the color of the badge
+    // {
+    //     return 'success'; // You can use any color from Tailwind CSS
+    // }
 }
