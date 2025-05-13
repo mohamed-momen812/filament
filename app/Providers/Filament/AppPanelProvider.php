@@ -35,13 +35,14 @@ class AppPanelProvider extends PanelProvider
             ->login() // optional: if you want to use the default login page
             ->registration() // optional: if you want to use the default register page
             ->userMenuItems([
+                'profile' => MenuItem::make()->label('Edit profile')->color('primary')->icon(asset('images/avatars/default.png')),
                 MenuItem::make()
                     ->label('Admin')
                     ->url('/admin')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->visible(fn (): bool => Auth::user()->is_admin),
             ])
-            ->font('Playfair Display')
+            ->font('inter')
             ->colors([
                 'danger' => Color::Red,
                 'gray' => Color::Slate,
@@ -58,7 +59,6 @@ class AppPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

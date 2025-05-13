@@ -29,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->profile()
             ->userMenuItems([
+                'profile' => MenuItem::make()->label('Edit profile')->color('primary')->icon(asset('images/avatars/default.png')),
                 MenuItem::make()
                     ->label('Dashboard')
                     ->url('/app')
@@ -42,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
-            ->font('Playfair Display')
+            ->font('inter')
             ->brandName('Filament')
             ->brandLogo(asset('images/admin-logo.png'))
             ->brandLogoHeight('6rem')
@@ -53,9 +54,9 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // ->topNavigation()
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

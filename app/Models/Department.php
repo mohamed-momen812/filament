@@ -8,8 +8,7 @@ class Department extends Model
 {
     protected $fillable = [
         'name',
-        'country_id',
-        'city_id',
+        'team_id'
     ];
 
     public function employees()

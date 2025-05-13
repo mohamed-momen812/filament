@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Filament\Models\Contracts\HasAvatar;
 
-class User extends Authenticatable implements HasTenants
+class User extends Authenticatable implements HasTenants, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -53,17 +54,17 @@ class User extends Authenticatable implements HasTenants
         ];
     }
 
-    public function teams():BelongsToMany
+    public function teams():BelongsToMany // to access the teams of the user
     {
         return $this->belongsToMany(Team::class);
     }
 
-    public function getTenants(Panel $panel):Collection
+    public function getTenants(Panel $panel):Collection // to access the tenants of the user
     {
         return $this->teams;
     }
 
-    public function canAccessTenant(Model $tenant):bool
+    public function canAccessTenant(Model $tenant):bool // to check if the user can access the tenant
     {
         return $this->teams()->whereKey($tenant)->exists();
     }
@@ -71,5 +72,10 @@ class User extends Authenticatable implements HasTenants
     public function isAdmin():bool
     {
         return $this->email === 'momen@gmail.com';
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return asset('images/avatars/default.png');
     }
 }
